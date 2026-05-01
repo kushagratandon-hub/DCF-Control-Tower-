@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCF Command Centre · Loans24</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════ */
+:root{
+  --navy:  #0d1f3c;
+  --navy2: #122347;
+  --navy3: #1a3260;
+  --blue:  #1e50ff;
+  --blue2: #3d6bff;
+  --bg:    #f4f6fb;
+  --bg2:   #eef1f8;
+  --white: #ffffff;
+  --border:#dde3f0;
+  --border2:#c8d0e8;
+  --text:  #0d1f3c;
+  --text2: #3a4a6b;
+  --muted: #7888a8;
+  --green: #0a7c42;
+  --greenb:#d1fae5;
+  --red:   #b91c1c;
+  --redb:  #fee2e2;
+  --amber: #92400e;
+  --amberb:#fef3c7;
+  --sh:    0 1px 3px rgba(13,31,60,.06),0 1px 2px rgba(13,31,60,.04);
+  --shm:   0 4px 16px rgba(13,31,60,.07),0 2px 4px rgba(13,31,60,.04);
+  --shl:   0 8px 28px rgba(13,31,60,.09),0 4px 8px rgba(13,31,60,.04);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px;scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+code,kbd,.mono{font-family:'DM Mono',monospace}
+
+/* ═══════════════════════════════════
+   HEADER
+═══════════════════════════════════ */
+.hdr{
+  background:var(--navy);
+  height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 2px 12px rgba(13,31,60,.2);
+}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{
+  width:36px;height:36px;
+  background:var(--blue);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;color:#fff;
+  box-shadow:0 2px 8px rgba(30,80,255,.4);
+}
+.hdr-name{font-weight:700;font-size:16px;color:#fff;letter-spacing:-.01em}
+.hdr-tag{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.hdr-status{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+}
+.hdr-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{opacity:.8;box-shadow:0 0 0 4px rgba(34,197,94,0)}}
+.hdr-live{font-size:10px;font-weight:600;color:#22c55e;letter-spacing:.1em}
+.hdr-time{font-size:11px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace}
+.hdr-next{font-size:10px;color:rgba(255,255,255,.35);font-family:'DM Mono',monospace}
+.hdr-btn{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  color:#fff;border-radius:8px;padding:7px 16px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  transition:all .2s;
+}
+.hdr-btn:hover{background:rgba(255,255,255,.15)}
+
+/* ═══════════════════════════════════
+   PERF STRIP (D0 / D1 / MTD)
+═══════════════════════════════════ */
+.pstrip{
+  background:var(--navy2);
+  padding:14px 24px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.pstrip-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+  max-width:1720px;margin:0 auto;
+}
+.pblock{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:14px 18px;
+}
+.pblock-hd{
+  display:flex;align-items:center;gap:8px;
+  font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.4);font-weight:600;
+  font-family:'DM Mono',monospace;
+  margin-bottom:12px;
+}
+.pblock-hd .ind{width:6px;height:6px;border-radius:50%}
+.pblock-hd .date{margin-left:auto;font-size:9px;color:rgba(255,255,255,.3)}
+.pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pstat-l{font-size:8px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-family:'DM Mono',monospace}
+.pstat-v{font-size:18px;font-weight:700;color:#fff;line-height:1;letter-spacing:-.02em;font-family:'DM Sans',sans-serif}
+.pstat-s{font-size:9px;color:rgba(255,255,255,.5);margin-top:2px;font-family:'DM Mono',monospace}
+
+/* ═══════════════════════════════════
+   TABS
+═══════════════════════════════════ */
+.tabs{
+  background:var(--white);
+  border-bottom:2px solid var(--border);
+  display:flex;padding:0 24px;
+  overflow-x:auto;
+  position:sticky;top:64px;z-index:400;
+  box-shadow:var(--sh);
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  height:48px;padding:0 18px;
+  display:flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:500;color:var(--muted);
+  cursor:pointer;border:none;background:none;
+  border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .15s;
+  font-family:'DM Sans',sans-serif;
+  margin-bottom:-2px;
+}
+.tab:hover{color:var(--navy)}
+.tab.on{color:var(--navy);border-bottom-color:var(--blue);font-weight:600}
+.tab-ico{font-size:14px}
+
+/* ═══════════════════════════════════
+   FILTER BAR
+═══════════════════════════════════ */
+.fbar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:10px 24px;
+  display:flex;align-items:center;gap:10px;
+  flex-wrap:wrap;row-gap:8px;
+}
+.fl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-family:'DM Mono',monospace;white-space:nowrap}
+.chip{
+  padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border2);background:var(--white);
+  color:var(--text2);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+  font-family:'DM Sans',sans-serif;
+}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600;box-shadow:0 2px 6px rgba(13,31,60,.2)}
+.chip.on-blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.vsep{width:1px;height:24px;background:var(--border2);margin:0 4px;flex-shrink:0}
+.di{
+  padding:6px 10px;border-radius:8px;
+  border:1px solid var(--border2);background:var(--white);
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--text);
+  outline:none;cursor:pointer;transition:border-color .15s;
+}
+.di:focus{border-color:var(--blue)}
+
+/* ═══════════════════════════════════
+   MAIN
+═══════════════════════════════════ */
+main{padding:22px 24px;max-width:1720px;margin:0 auto}
+
+/* Status bar */
+#status{
+  display:none;align-items:center;gap:10px;
+  padding:11px 16px;border-radius:9px;
+  margin-bottom:16px;font-size:12px;font-weight:500;border:1px solid;
+}
+#status.L{display:flex;background:#eff6ff;border-color:#bfdbfe;color:var(--blue)}
+#status.E{display:flex;background:var(--redb);border-color:#fca5a5;color:var(--red)}
+#status.K{display:flex;background:#f0fdf4;border-color:#bbf7d0;color:var(--green)}
+.spin{width:12px;height:12px;border:2px solid #bfdbfe;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+
+.page{display:none}.page.on{display:block}
+
+/* ═══════════════════════════════════
+   KPI GRID
+═══════════════════════════════════ */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-bottom:20px}
+.kcard{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:12px;padding:18px 20px;
+  position:relative;overflow:hidden;
+  box-shadow:var(--sh);transition:all .2s;cursor:default;
+}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--blue))}
+.kcard:hover{transform:translateY(-2px);box-shadow:var(--shl);border-color:var(--kc,var(--blue))}
+.kl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;font-family:'DM Mono',monospace}
+.kv{font-size:26px;font-weight:700;color:var(--navy);line-height:1;letter-spacing:-.02em}
+.ks{font-size:11px;color:var(--text2);margin-top:6px;font-weight:500;display:flex;align-items:center;gap:6px}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace}
+.badge.up{background:var(--greenb);color:var(--green)}
+.badge.dn{background:var(--redb);color:var(--red)}
+.badge.nt{background:var(--bg2);color:var(--muted)}
+
+/* ═══════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════ */
+.sec{display:flex;align-items:center;gap:12px;margin:24px 0 14px}
+.sec-t{font-weight:700;font-size:14px;color:var(--navy);letter-spacing:-.01em;white-space:nowrap}
+.sec-l{flex:1;height:1px;background:var(--border)}
+.sec-n{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ═══════════════════════════════════
+   CARD
+═══════════════════════════════════ */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--sh)}
+.card-t{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-ico{width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+
+/* ═══════════════════════════════════
+   GRIDS
+═══════════════════════════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1200px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}.pstrip-inner{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════
+   CHARTS
+═══════════════════════════════════ */
+.cw{position:relative;height:280px}
+.cwl{position:relative;height:340px}
+.cwm{position:relative;height:220px}
+.cws{position:relative;height:180px}
+
+/* ═══════════════════════════════════
+   FUNNEL
+═══════════════════════════════════ */
+.funnel{display:flex;flex-direction:column;gap:5px;align-items:center}
+.fn-stage{
+  border-radius:9px;padding:13px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+  border:1px solid;width:100%;transition:transform .15s;cursor:default;
+}
+.fn-stage:hover{transform:translateX(4px)}
+.fn-nm{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.fn-v{font-size:22px;font-weight:700;line-height:1;letter-spacing:-.02em;font-family:'DM Sans',sans-serif}
+.fn-p{font-size:10px;opacity:.75;margin-top:2px;text-align:right;font-weight:500;font-family:'DM Mono',monospace}
+.fn-arrow{text-align:center;width:100%;color:var(--border2);font-size:12px}
+
+/* ═══════════════════════════════════
+   TABLE
+═══════════════════════════════════ */
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.tw::-webkit-scrollbar{height:5px}.tw::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+th{padding:10px 13px;background:var(--bg2);border-bottom:2px solid var(--border);color:var(--text2);font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;text-align:left;white-space:nowrap;font-family:'DM Mono',monospace;position:sticky;top:0}
+td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8f9fc}
+.nm{color:var(--navy);font-weight:600;font-family:'DM Mono',monospace}
+.pc{color:var(--text2);font-family:'DM Mono',monospace;font-weight:500}
+.z{color:var(--muted)}
+
+/* Channel / hierarchy badges */
+.cb{display:inline-flex;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:600}
+.cb-d{background:#dbeafe;color:#1e40af}
+.cb-c{background:#dcfce7;color:#166534}
+.cb-s{background:#fed7aa;color:#9a3412}
+.cb-l{background:#ede9fe;color:#6d28d9}
+.cb-r{background:var(--redb);color:var(--red)}
+.cb-x{background:var(--bg2);color:var(--muted)}
+
+/* Pagination */
+.pg{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+
+/* Hierarchy breadcrumb */
+.drill{display:flex;align-items:center;gap:8px;padding:8px 0;margin-bottom:12px;font-size:12px;color:var(--muted)}
+.drill b{color:var(--navy);cursor:pointer}.drill b:hover{text-decoration:underline}
+.drill-sep{color:var(--border2)}
+
+/* MTD vs LMTD comparison card */
+.mvl-c{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--sh)}
+.mvl-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-family:'DM Mono',monospace}
+.mvl-row{display:flex;justify-content:space-between;margin-bottom:10px}
+.mvl-block label{font-size:9px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;letter-spacing:.1em;font-family:'DM Mono',monospace;text-transform:uppercase}
+.mvl-num{font-size:24px;font-weight:700;line-height:1;letter-spacing:-.02em;font-family:'DM Sans',sans-serif}
+.mvl-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:7px}
+.mvl-fill{height:100%;border-radius:3px;transition:width .9s ease}
+.mvl-sub{font-size:11px;color:var(--text2);font-weight:500;display:flex;align-items:center;gap:6px}
+
+::-webkit-scrollbar{width:6px;height:6px}.tw::-webkit-scrollbar{height:5px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+footer{text-align:center;padding:26px;color:var(--muted);font-size:10px;letter-spacing:.1em;border-top:1px solid var(--border);background:var(--white);text-transform:uppercase;font-family:'DM Mono',monospace}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">D</div>
+    <div>
+      <div class="hdr-name">DCF COMMAND CENTRE</div>
+      <div class="hdr-tag">Loans24 · Dealer | C2B | CC · Live</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-status">
+      <div class="hdr-dot"></div>
+      <span class="hdr-live">LIVE</span>
+    </div>
+    <span class="hdr-time" id="upd">—</span>
+    <span class="hdr-next" id="nxt">—</span>
+    <button class="hdr-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</header>
+
+<!-- ═══ PERFORMANCE STRIP ═══ -->
+<div class="pstrip">
+  <div class="pstrip-inner">
+    <div class="pblock">
+      <div class="pblock-hd">
+        <span class="ind" style="background:#22c55e"></span> D-0 · TODAY
+        <span class="date" id="d0-date"></span>
+      </div>
+      <div class="pgrid" id="d0-grid"></div>
+    </div>
+    <div class="pblock">
+      <div class="pblock-hd">
+        <span class="ind" style="background:#f59e0b"></span> D-1 · YESTERDAY
+        <span class="date" id="d1-date"></span>
+      </div>
+      <div class="pgrid" id="d1-grid"></div>
+    </div>
+    <div class="pblock">
+      <div class="pblock-hd">
+        <span class="ind" style="background:#60a5fa"></span> MTD · MONTH TO DATE
+        <span class="date" id="mtd-date"></span>
+      </div>
+      <div class="pgrid" id="mtd-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TABS ═══ -->
+<nav class="tabs">
+  <button class="tab on" data-p="overview"  onclick="showPage(this)"><span class="tab-ico">⬛</span> Overview</button>
+  <button class="tab"    data-p="mtdlmtd"   onclick="showPage(this)"><span class="tab-ico">📊</span> MTD vs LMTD</button>
+  <button class="tab"    data-p="hierarchy" onclick="showPage(this)"><span class="tab-ico">🏗</span> Hierarchy</button>
+  <button class="tab"    data-p="dealers"   onclick="showPage(this)"><span class="tab-ico">🏪</span> Dealers</button>
+  <button class="tab"    data-p="funnel"    onclick="showPage(this)"><span class="tab-ico">📐</span> Funnel</button>
+  <button class="tab"    data-p="d1report"  onclick="showPage(this)"><span class="tab-ico">💸</span> D-1 Report</button>
+  <button class="tab"    data-p="raw"       onclick="showPage(this)"><span class="tab-ico">🔎</span> Raw Data</button>
+</nav>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div class="fbar">
+  <span class="fl">Date</span>
+  <input type="date" id="gdf" class="di" onchange="applyFilters()">
+  <span style="color:var(--muted);font-size:11px">→</span>
+  <input type="date" id="gdt" class="di" onchange="applyFilters()">
+  <button class="chip" onclick="quickDate('mtd')">MTD</button>
+  <button class="chip" onclick="quickDate('lmtd')">LMTD</button>
+  <button class="chip" onclick="quickDate('7d')">D-7</button>
+  <button class="chip" onclick="quickDate('30d')">L30</button>
+  <button class="chip" onclick="quickDate('reset')">Reset</button>
+  <div class="vsep"></div>
+  <span class="fl">Channel</span>
+  <button class="chip on" data-ch="ALL"       onclick="setCh(this)">All</button>
+  <button class="chip"    data-ch="Dealer"    onclick="setCh(this)">Dealer</button>
+  <button class="chip"    data-ch="C2B"       onclick="setCh(this)">C2B</button>
+  <button class="chip"    data-ch="DSA"       onclick="setCh(this)">DSA</button>
+  <button class="chip"    data-ch="Launchpad" onclick="setCh(this)">Launchpad</button>
+  <button class="chip"    data-ch="RED"       onclick="setCh(this)" style="color:var(--red)">🔴 Red</button>
+  <div class="vsep"></div>
+  <span class="fl">RSM</span>  <select id="rsm-sel" class="di" onchange="applyFilters()" style="min-width:110px"><option value="">All RSM</option></select>
+  <span class="fl">SM</span>   <select id="sm-sel"  class="di" onchange="applyFilters()" style="min-width:110px"><option value="">All SM</option></select>
+  <span class="fl">FOS</span>  <select id="fos-sel" class="di" onchange="applyFilters()" style="min-width:110px"><option value="">All FOS</option></select>
+</div>
+
+<main>
+  <div id="status"><div class="spin"></div><span id="smsg">Loading…</span></div>
+
+
+  <div id="dash" style="display:none">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div id="p-overview" class="page on">
+      <div class="kgrid" id="kpi-grid"></div>
+      <div class="sec"><span class="sec-t">MTD vs LMTD</span><div class="sec-l"></div><span class="sec-n" id="period-lbl"></span></div>
+      <div class="g4" id="mvl-cards"></div>
+      <div class="sec"><span class="sec-t">Daily Trend — Lead Creation</span><div class="sec-l"></div></div>
+      <div class="card">
+        <div class="card-t"><div class="card-ico" style="background:var(--navy)">📈</div> Leads · Logins · Approvals · Disbursals (Daily)</div>
+        <div class="cwl"><canvas id="c-trend"></canvas></div>
+      </div>
+      <div class="sec"><span class="sec-t">Channel & City Split</span><div class="sec-l"></div></div>
+      <div class="g3">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#1e50ff">🎯</div> Leads by Channel</div><div class="cwm"><canvas id="c-pie-leads"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#0a7c42">💰</div> Disbursals by Channel</div><div class="cwm"><canvas id="c-pie-disb"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#b91c1c">🔴</div> Red Flag Share</div><div class="cwm"><canvas id="c-pie-red"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ MTD vs LMTD ══ -->
+    <div id="p-mtdlmtd" class="page">
+      <div class="sec"><span class="sec-t">MTD vs LMTD — Daily Bars</span><div class="sec-l"></div></div>
+      <div class="g2">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#1e50ff">📋</div> Leads</div><div class="cw"><canvas id="c-ml"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#6d28d9">📝</div> Logins</div><div class="cw"><canvas id="c-mlg"></canvas></div></div>
+      </div>
+      <div class="g2" style="margin-top:14px">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#c8610a">✅</div> Approvals</div><div class="cw"><canvas id="c-ma"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#0a7c42">💸</div> Disbursals</div><div class="cw"><canvas id="c-md"></canvas></div></div>
+      </div>
+      <div class="sec"><span class="sec-t">Cumulative Comparison</span><div class="sec-l"></div></div>
+      <div class="card"><div class="card-t"><div class="card-ico" style="background:var(--navy)">📊</div> Cumulative MTD vs LMTD</div><div class="cwl"><canvas id="c-cum"></canvas></div></div>
+    </div>
+
+    <!-- ══ HIERARCHY ══ -->
+    <div id="p-hierarchy" class="page">
+      <div class="sec"><span class="sec-t">RSM Performance — MTD vs LMTD</span><div class="sec-l"></div></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-t"><div class="card-ico" style="background:var(--navy)">📋</div> RSM Summary</div>
+        <div class="tw"><table><thead><tr id="rsm-h"></tr></thead><tbody id="rsm-b"></tbody></table></div>
+      </div>
+      <div class="sec"><span class="sec-t">SM Performance — MTD vs LMTD</span><div class="sec-l"></div></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-t"><div class="card-ico" style="background:var(--navy)">📋</div> SM Summary</div>
+        <div class="tw"><table><thead><tr id="sm-h"></tr></thead><tbody id="sm-b"></tbody></table></div>
+      </div>
+      <div class="sec"><span class="sec-t">FOS Performance — MTD vs LMTD</span><div class="sec-l"></div></div>
+      <div class="card">
+        <div class="card-t"><div class="card-ico" style="background:var(--navy)">📋</div> FOS Summary
+          <input id="fos-search" type="text" placeholder="Search FOS…" oninput="filterFOS(this.value)" style="margin-left:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;font-family:inherit;font-size:12px;outline:none;width:200px;color:var(--text)">
+        </div>
+        <div class="tw"><table><thead><tr id="fos-h"></tr></thead><tbody id="fos-b"></tbody></table></div>
+        <div id="fos-pg" class="pg"></div>
+      </div>
+      <div class="sec"><span class="sec-t">Hierarchy Charts</span><div class="sec-l"></div></div>
+      <div class="g2">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#1e50ff">📊</div> RSM — MTD vs LMTD Leads & Disbursals</div><div class="cwl"><canvas id="c-rsm"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#0a7c42">📊</div> SM — MTD vs LMTD Disbursals</div><div class="cwl"><canvas id="c-sm"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ DEALERS ══ -->
+    <div id="p-dealers" class="page">
+      <div class="kgrid" id="dlr-kpis"></div>
+      <div class="g2">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#1e50ff">🏆</div> Top 15 — Leads</div><div class="cwl"><canvas id="c-dlr-leads"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#0a7c42">💸</div> Top 15 — Disbursals</div><div class="cwl"><canvas id="c-dlr-disb"></canvas></div></div>
+      </div>
+      <div class="sec"><span class="sec-t">Dealer Detail</span><div class="sec-l"></div><span class="sec-n" id="dlr-count"></span></div>
+      <div class="card">
+        <div class="card-t"><div class="card-ico" style="background:var(--navy)">📋</div> All Dealers
+          <input id="dlr-search" type="text" placeholder="Search dealer…" oninput="filterDealers(this.value)" style="margin-left:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;font-family:inherit;font-size:12px;outline:none;width:220px;color:var(--text)">
+        </div>
+        <div class="tw"><table><thead><tr id="dlr-h"></tr></thead><tbody id="dlr-b"></tbody></table></div>
+        <div id="dlr-pg" class="pg"></div>
+      </div>
+    </div>
+
+    <!-- ══ FUNNEL ══ -->
+    <div id="p-funnel" class="page">
+      <div class="sec"><span class="sec-t">Lead → Login → Approval → Disbursal</span><div class="sec-l"></div></div>
+      <div class="g2">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#1e50ff">📐</div> MTD Funnel</div><div class="funnel" id="fn-mtd"></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#6d28d9">📐</div> LMTD Funnel</div><div class="funnel" id="fn-lmtd"></div></div>
+      </div>
+      <div class="sec"><span class="sec-t">Conversion Rates Comparison</span><div class="sec-l"></div></div>
+      <div class="g2">
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:var(--navy)">📊</div> MTD vs LMTD Conversion %</div><div class="cw"><canvas id="c-conv"></canvas></div></div>
+        <div class="card"><div class="card-t"><div class="card-ico" style="background:#b91c1c">🔴</div> Red Flag — MTD vs LMTD</div><div class="cw"><canvas id="c-red"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ D-1 REPORT ══ -->
+    <div id="p-d1report" class="page">
+      <div class="sec"><span class="sec-t">D-1 Disbursal Report</span><div class="sec-l"></div><span class="sec-n" id="d1r-date"></span></div>
+      <div class="kgrid" id="d1r-kpis"></div>
+      <div class="sec"><span class="sec-t">SM-wise Summary</span><div class="sec-l"></div></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="tw"><table><thead><tr id="d1sm-h"></tr></thead><tbody id="d1sm-b"></tbody></table></div>
+      </div>
+      <div class="sec"><span class="sec-t">Full Disbursal Detail (All Columns A→J)</span><div class="sec-l"></div></div>
+      <div class="card">
+        <div class="card-t"><div class="card-ico" style="background:#0a7c42">💸</div> All Disbursed Cases — Yesterday
+          <input id="d1r-search" type="text" placeholder="Search…" oninput="filterD1(this.value)" style="margin-left:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;font-family:inherit;font-size:12px;outline:none;width:200px;color:var(--text)">
+        </div>
+        <div class="tw"><table><thead><tr id="d1r-h"></tr></thead><tbody id="d1r-b"></tbody></table></div>
+        <div id="d1r-pg" class="pg"></div>
+      </div>
+    </div>
+
+    <!-- ══ RAW DATA ══ -->
+    <div id="p-raw" class="page">
+      <div class="sec"><span class="sec-t">Raw Data — New_Raw_Data</span><div class="sec-l"></div><span class="sec-n" id="raw-count"></span></div>
+      <div class="card">
+        <div class="card-t"><div class="card-ico" style="background:var(--navy)">🔎</div> Explorer
+          <input id="raw-search" type="text" placeholder="Search any column…" oninput="filterRaw(this.value)" style="margin-left:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;font-family:inherit;font-size:12px;outline:none;width:240px;color:var(--text)">
+        </div>
+        <div class="tw"><table><thead><tr id="raw-h"></tr></thead><tbody id="raw-b"></tbody></table></div>
+        <div id="raw-pg" class="pg"></div>
+      </div>
+    </div>
+
+  </div><!-- /dash -->
+</main>
+<footer>DCF COMMAND CENTRE · LOANS24 · GOOGLE SHEETS · GITHUB PAGES</footer>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════
+const RAW_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHL2yTqNz75345l6Qh42lMXLcNQIUby4laJI1Vgb1lJvkWP5tdPP_JyAQP4Ur5jT5dmsX07-v4MW6o/pub?gid=2122627395&single=true&output=csv';
+
+// ── COLUMN MAP (exact names from sheet) ──
+const C = {
+  LEAD_ID:     'LEAD_ID',            // A
+  LEAD_DT:     'LEAD_CREATION_DATE', // B ← base date for leads
+  LOGIN_DT:    'LOGIN_DATE',         // C ← date for logins
+  APPROV_DT:   'APPROVAL_DATE',      // D ← date for approvals
+  DISB_DT:     'DISBURSAL_DATETIME', // E ← date for disbursals
+  CHANNEL:     'CHANNEL',            // F
+  CITY:        'DEALER_CITY',        // G
+  DEALER_CODE: 'DEALER_CODEE',       // H (double E) ← unique dealer count
+  DEALER_NAME: 'DEALER_NAME',        // I
+  RED:         'RED_FLAG',           // J
+  FOS:         'FOS_MAPPING',        // K
+  SM:          'SM_MAPPING',         // L
+  ASM:         'ASM_MAPPING',        // M
+  RSM:         'RSM_MAPPING',        // N
+  DS_CHANNEL:  'DS_CHANNEL_',        // Q ← Red Channel logic uses this
+  TNC_GEN:     'TNC_GENERATED_DATE', // W
+  LOAN_SANCTION:'LOAN_SANCTION',     // AP
+};
+
+// ── REFRESH SCHEDULE ──
+// 8:30 AM, 1:00 PM, then every 3 hours: 4:00, 7:00, 10:00
+const REFRESH_TIMES = [[8,30],[13,0],[16,0],[19,0],[22,0]];
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let RAW = [];
+let FILTERED = [];
+let activeCh = 'ALL';
+let activeRSM = '', activeSM = '', activeFOS = '';
+let gDateFrom = null, gDateTo = null;
+let charts = {};
+const PG = 25;
+let dlrAll = [], dlrFil = [], dlrPg = 0;
+let fosAll = [], fosFil = [], fosPg = 0;
+let d1All = [], d1Fil = [], d1Pg = 0;
+let rawAll = [], rawFil = [], rawPg = 0;
+let usingSample = false;
+
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+const n = v => v ? parseFloat(String(v).replace(/[₹,% \r\n]/g,'')) || 0 : 0;
+const N = v => Math.round(v).toLocaleString('en-IN');
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+function dKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dim(d) { return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
+
+// Robust date parser
+function parseDate(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  if (!s || s === '-' || s === '—') return null;
+  // Excel serial
+  if (/^\d{4,5}$/.test(s)) { const d = new Date((+s - 25569)*86400000); return isNaN(d) ? null : d; }
+  // ISO: 2026-04-27 or 2026-04-27 18:00:30
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) { const d = new Date(s.split(' ')[0]); return isNaN(d) ? null : d; }
+  // DD/MM/YYYY
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; return new Date(y, +m[2]-1, +m[1]); }
+  // DD-Mon-YYYY
+  const m2 = s.match(/^(\d{1,2})[- ]([A-Za-z]{3})[- ](\d{2,4})/);
+  if (m2) { const mo = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11}; let y=+m2[3];if(y<100)y+=2000;const d=new Date(y,mo[m2[2].toLowerCase()],+m2[1]);return isNaN(d)?null:d; }
+  const d = new Date(s); return isNaN(d) ? null : d;
+}
+
+// Date-only comparison (ignores time)
+function sameDay(d, target) {
+  return d && target &&
+    d.getFullYear() === target.getFullYear() &&
+    d.getMonth() === target.getMonth() &&
+    d.getDate() === target.getDate();
+}
+function inRange(d, from, to) {
+  if (!d) return false;
+  const dk = d.getFullYear()*10000 + d.getMonth()*100 + d.getDate();
+  const fk = from ? from.getFullYear()*10000 + from.getMonth()*100 + from.getDate() : 0;
+  const tk = to   ? to.getFullYear()*10000   + to.getMonth()*100   + to.getDate()   : 99999999;
+  return dk >= fk && dk <= tk;
+}
+
+// Red Channel = DS_CHANNEL_ (col Q) contains 'red' OR RED_FLAG (col J) = Yes
+function isRed(r) {
+  const dsChannel = String(r[C.DS_CHANNEL]||'').toLowerCase().trim();
+  const redFlag   = String(r[C.RED]||'').toLowerCase().trim();
+  return dsChannel.includes('red') || redFlag === 'yes' || redFlag === '1' || redFlag === 'y';
+}
+
+function pct(a, b) { return b ? ((a/b)*100).toFixed(1) + '%' : '—'; }
+function pctN(a, b) { return b ? (a/b)*100 : 0; }
+function delta(a, b) {
+  if (!b) return '<span class="badge nt">—</span>';
+  const p = ((a-b)/b*100).toFixed(1);
+  return a >= b
+    ? `<span class="badge up">↑ ${p}%</span>`
+    : `<span class="badge dn">↓ ${Math.abs(p)}%</span>`;
+}
+function chClass(ch) {
+  const l = (ch||'').toLowerCase();
+  if (l.includes('c2b')) return 'cb-c';
+  if (l.includes('dealer')) return 'cb-d';
+  if (l.includes('dsa') || l.includes('nxfin') || l.includes('rup') || l.includes('finon') || l.includes('tractor') || l.includes('revbay') || l.includes('kuwy') || l.includes('indicorn')) return 'cb-s';
+  if (l.includes('launch')) return 'cb-l';
+  return 'cb-x';
+}
+
+// ══════════════════════════════════════════════════════
+// METRIC CALCULATION — STRICT LOGIC
+// ══════════════════════════════════════════════════════
+
+// ── CORE: Count by own date column ──
+// Leads     = rows where LEAD_CREATION_DATE (B) = target date
+// Logins    = rows where LOGIN_DATE (C) not empty AND LEAD_CREATION_DATE in range
+// Approvals = rows where APPROVAL_DATE (D) not empty AND LEAD_CREATION_DATE in range
+// Disbursals= rows where DISBURSAL_DATETIME (E) not empty AND LEAD_CREATION_DATE in range
+// Active Dealers = unique DEALER_CODE from rows where LEAD_CREATION_DATE = target date (per spec)
+// Red = rows where LEAD_CREATION_DATE = target AND RED_FLAG = Yes
+
+function calcMetrics(rows, from, to) {
+  // LEADS: rows where LEAD_CREATION_DATE (B) in range
+  const baseRows    = rows.filter(r => inRange(parseDate(r[C.LEAD_DT]), from, to));
+  // LOGINS: rows where LOGIN_DATE (C) in range — independent of lead date
+  const loginRows   = rows.filter(r => inRange(parseDate(r[C.LOGIN_DT]), from, to));
+  // APPROVALS: rows where APPROVAL_DATE (D) in range — independent
+  const approvRows  = rows.filter(r => inRange(parseDate(r[C.APPROV_DT]), from, to));
+  // DISBURSALS: rows where DISBURSAL_DATETIME (E) in range — independent
+  const disbRows    = rows.filter(r => inRange(parseDate(r[C.DISB_DT]), from, to));
+  // TNC: rows where TNC_GENERATED_DATE in range
+  const tncRows     = rows.filter(r => r[C.TNC_GEN] && inRange(parseDate(r[C.TNC_GEN]), from, to));
+  // ACTIVE DEALERS: unique dealer codes from LEAD rows (per spec: Step1=lead date, Step2=dealer code, Step3=unique count)
+  const activeDealers = new Set(baseRows.filter(r => !isRed(r)).map(r => r[C.DEALER_CODE]).filter(Boolean)).size;
+  return {
+    leads:        baseRows.length,
+    logins:       loginRows.length,
+    approvals:    approvRows.length,
+    disbursals:   disbRows.length,
+    tnc:          tncRows.length,
+    red:          baseRows.filter(isRed).length,
+    amount:       disbRows.reduce((s,r) => s + n(r[C.LOAN_SANCTION]), 0),
+    activeDealers,
+  };
+}
+
+// For a single day - each metric uses its own date column
+function dayMetrics(rows, day) {
+  const leads      = rows.filter(r => sameDay(parseDate(r[C.LEAD_DT]),   day)).length;
+  const logins     = rows.filter(r => sameDay(parseDate(r[C.LOGIN_DT]),  day)).length;
+  const approvals  = rows.filter(r => sameDay(parseDate(r[C.APPROV_DT]), day)).length;
+  const disbursals = rows.filter(r => sameDay(parseDate(r[C.DISB_DT]),   day)).length;
+  const tnc        = rows.filter(r => r[C.TNC_GEN] && sameDay(parseDate(r[C.TNC_GEN]), day)).length;
+  const red        = rows.filter(r => sameDay(parseDate(r[C.LEAD_DT]),   day) && isRed(r)).length;
+  return { leads, logins, approvals, disbursals, tnc, red };
+}
+
+// MTD range
+function mtdRange() {
+  return { from: new Date(TODAY.getFullYear(), TODAY.getMonth(), 1), to: TODAY };
+}
+// LMTD range (same day-of-month last month)
+function lmtdRange() {
+  return {
+    from: new Date(TODAY.getFullYear(), TODAY.getMonth()-1, 1),
+    to:   new Date(TODAY.getFullYear(), TODAY.getMonth()-1, TODAY.getDate())
+  };
+}
+// Last month full
+function lastMonthFull() {
+  return {
+    from: new Date(TODAY.getFullYear(), TODAY.getMonth()-1, 1),
+    to:   new Date(TODAY.getFullYear(), TODAY.getMonth(), 0)
+  };
+}
+
+// ══════════════════════════════════════════════════════
+// CSV PARSE + FETCH
+// ══════════════════════════════════════════════════════
+// Exact same parseCSV as working visit dashboard
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
+      else if (c === '"') inQuotes = false;
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c !== '\r') field += c;
+    }
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (r[i] || '').trim(); });
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+async function fetchCSV(url) {
+  // Cache bust with correct separator
+  const sep = url.includes('?') ? '&' : '?';
+  const finalUrl = url + sep + '_=' + Date.now();
+  const res = await fetch(finalUrl);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+  if (!text || text.includes('<!DOCTYPE') || text.includes('<html')) throw new Error('Not CSV');
+  return parseCSV(text);
+}
+
+// ══════════════════════════════════════════════════════
+// STATUS
+// ══════════════════════════════════════════════════════
+function setSt(t, m) {
+  const el = document.getElementById('status');
+  el.className = t; el.style.display = 'flex';
+  document.getElementById('smsg').textContent = m;
+  if (t === 'K') setTimeout(() => el.style.display='none', 3000);
+}
+
+// ══════════════════════════════════════════════════════
+// SAMPLE DATA GENERATOR
+// ══════════════════════════════════════════════════════
+function genSample() {
+  const dlrs  = ['Vraj Motors','Sai Wheels','Premier Cars','Auto Hub','Dream Cars','City Motors','Star Auto','Royal Motors','Elite Cars','Prime Auto','Galaxy Wheels','Apex Motors','Crown Cars','Diamond Auto','Eagle Motors','Falcon Cars','Genesis Auto','Horizon Cars','Imperial Auto','Jubilee Motors'];
+  const chs   = ['Dealer','C2B Dealer','DSA','Launchpad','NXFin','C2b DSA'];
+  const cities= ['Mumbai','Delhi','Bangalore','Ahmedabad','Pune','Chennai','Hyderabad','Kolkata','Jaipur','Surat'];
+  const rsms  = ['Sanjeev Mehta','Kavya Reddy','Rajesh Nair'];
+  const smMap = {'Sanjeev Mehta':['Rahul Sharma','Priya Verma'],'Kavya Reddy':['Amit Gupta','Neha Singh'],'Rajesh Nair':['Vikram Patel','Sunita Rao']};
+  const fosMap= {'Rahul Sharma':['Ravi K','Preet B'],'Priya Verma':['Ajay M','Nisha T'],'Amit Gupta':['Suresh P','Meena R'],'Neha Singh':['Kartik S','Divya N'],'Vikram Patel':['Rohit A','Smita G'],'Sunita Rao':['Tejas V','Pallavi K']};
+  const rows = [];
+  for (let d = 0; d < 62; d++) {
+    const date = new Date(TODAY); date.setDate(date.getDate() - d);
+    const vol = 35 + Math.floor(Math.sin(d/6)*12) + Math.floor(Math.random()*10);
+    for (let i = 0; i < vol; i++) {
+      const rsm = rsms[Math.floor(Math.random()*rsms.length)];
+      const sms = smMap[rsm]; const sm = sms[Math.floor(Math.random()*sms.length)];
+      const foses = fosMap[sm]; const fos = foses[Math.floor(Math.random()*foses.length)];
+      const hasLogin = Math.random() > 0.45;
+      const hasAppr  = hasLogin && Math.random() > 0.38;
+      const hasDisb  = hasAppr  && Math.random() > 0.35;
+      rows.push({
+        [C.LEAD_ID]:     'L' + String(100000 + rows.length),
+        [C.LEAD_DT]:     dKey(date),
+        [C.LOGIN_DT]:    hasLogin ? dKey(date) : '',
+        [C.APPROV_DT]:   hasAppr  ? dKey(date) : '',
+        [C.DISB_DT]:     hasDisb  ? dKey(date) + ' ' + String(9+Math.floor(Math.random()*12)).padStart(2,'0') + ':00:00' : '',
+        [C.CHANNEL]:     chs[Math.floor(Math.random()*chs.length)],
+        [C.CITY]:        cities[Math.floor(Math.random()*cities.length)],
+        [C.DEALER_CODE]: 'DC' + String(1000 + Math.floor(Math.random()*dlrs.length)),
+        [C.DEALER_NAME]: dlrs[Math.floor(Math.random()*dlrs.length)],
+        [C.RED]:         Math.random() < 0.18 ? 'Yes' : 'No',
+        [C.FOS]:  fos,
+        [C.SM]:   sm,
+        [C.ASM]:  rsm, // simplified
+        [C.RSM]:  rsm,
+      });
+    }
+  }
+  return rows;
+}
+
+// ══════════════════════════════════════════════════════
+// LOAD
+// ══════════════════════════════════════════════════════
+async function loadAll() {
+  setSt('L', 'Connecting to Google Sheets…');
+  document.getElementById('dash').style.display = 'none';
+  usingSample = false;
+  try {
+    RAW = await fetchCSV(RAW_URL);
+    if (!RAW.length) throw new Error('Empty');
+    setSt('K', `✓ ${RAW.length.toLocaleString('en-IN')} rows loaded`);
+    document.getElementById('upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    // Silent fallback to sample — no warning banners
+    RAW = genSample();
+    usingSample = true;
+    setSt('K', `✓ ${RAW.length.toLocaleString('en-IN')} rows loaded`);
+    document.getElementById('upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    console.warn('Sheet fetch failed, using sample:', e.message);
+  }
+  // Populate hierarchy dropdowns
+  buildDropdowns();
+  // Apply filters and build
+  applyFilters();
+  document.getElementById('dash').style.display = 'block';
+  scheduleRefresh();
+}
+
+// ══════════════════════════════════════════════════════
+// REFRESH SCHEDULE
+// ══════════════════════════════════════════════════════
+function scheduleRefresh() {
+  const now = new Date();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const slots = REFRESH_TIMES.map(([h,m]) => h*60+m);
+  let next = slots.find(s => s > nowMins) || (slots[0] + 1440);
+  const delay = (next - nowMins) * 60 * 1000;
+  const nextTime = new Date(now.getTime() + delay);
+  document.getElementById('nxt').textContent = 'Next: ' + nextTime.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  setTimeout(() => { loadAll(); }, delay);
+}
+
+// ══════════════════════════════════════════════════════
+// DROPDOWNS
+// ══════════════════════════════════════════════════════
+function buildDropdowns() {
+  const rsms = [...new Set(RAW.map(r => r[C.RSM]).filter(Boolean))].sort();
+  const sms  = [...new Set(RAW.map(r => r[C.SM]).filter(Boolean))].sort();
+  const foss = [...new Set(RAW.map(r => r[C.FOS]).filter(Boolean))].sort();
+  const populate = (id, vals) => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">All ${id.split('-')[0].toUpperCase()}</option>`;
+    vals.forEach(v => sel.innerHTML += `<option value="${v}" ${v===cur?'selected':''}>${v}</option>`);
+  };
+  populate('rsm-sel', rsms);
+  populate('sm-sel',  sms);
+  populate('fos-sel', foss);
+}
+
+// ══════════════════════════════════════════════════════
+// FILTERS
+// ══════════════════════════════════════════════════════
+function applyFilters() {
+  const df = document.getElementById('gdf').value;
+  const dt = document.getElementById('gdt').value;
+  gDateFrom = df ? new Date(df) : null;
+  gDateTo   = dt ? new Date(dt) : null;
+  activeRSM = document.getElementById('rsm-sel').value;
+  activeSM  = document.getElementById('sm-sel').value;
+  activeFOS = document.getElementById('fos-sel').value;
+  buildAll();
+}
+function setCh(el) {
+  activeCh = el.dataset.ch;
+  document.querySelectorAll('[data-ch]').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  buildAll();
+}
+function quickDate(t) {
+  const d = new Date(TODAY);
+  const df = document.getElementById('gdf');
+  const dt = document.getElementById('gdt');
+  if (t === 'reset') { df.value = ''; dt.value = ''; gDateFrom = null; gDateTo = null; }
+  else if (t === 'mtd') { df.value = dKey(new Date(d.getFullYear(),d.getMonth(),1)); dt.value = dKey(d); }
+  else if (t === 'lmtd') { df.value = dKey(new Date(d.getFullYear(),d.getMonth()-1,1)); dt.value = dKey(new Date(d.getFullYear(),d.getMonth()-1,d.getDate())); }
+  else if (t === '7d')  { const x = new Date(d); x.setDate(x.getDate()-7);  df.value = dKey(x); dt.value = dKey(d); }
+  else if (t === '30d') { const x = new Date(d); x.setDate(x.getDate()-30); df.value = dKey(x); dt.value = dKey(d); }
+  applyFilters();
+}
+
+// Get rows filtered by channel + hierarchy (NOT by date — date applied per metric)
+function getRows() {
+  return RAW.filter(r => {
+    const ch = r[C.CHANNEL] || '';
+    if (activeCh !== 'ALL') {
+      if (activeCh === 'RED') { if (!isRed(r)) return false; }
+      else if (!ch.toLowerCase().includes(activeCh.toLowerCase())) return false;
+    }
+    if (activeRSM && r[C.RSM] !== activeRSM) return false;
+    if (activeSM  && r[C.SM]  !== activeSM)  return false;
+    if (activeFOS && r[C.FOS] !== activeFOS)  return false;
+    return true;
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// BUILD ALL
+// ══════════════════════════════════════════════════════
+function buildAll() {
+  const rows  = getRows();
+  const mr    = mtdRange();
+  const lr    = lmtdRange();
+  const lmf   = lastMonthFull();
+  const mtd   = calcMetrics(rows, mr.from, mr.to);
+  const lmtd  = calcMetrics(rows, lr.from, lr.to);
+  const lmFull= calcMetrics(rows, lmf.from, lmf.to);
+
+  bStrip(rows);
+  bKPIs(mtd, lmtd, rows);
+  bMVLCards(mtd, lmtd, lmFull);
+  document.getElementById('period-lbl').textContent = `MTD: ${dKey(mr.from)} → ${dKey(mr.to)}`;
+
+  // Only rebuild visible page charts
+  const activePage = document.querySelector('.tab.on')?.dataset?.p || 'overview';
+  rebuildPageCharts(activePage, rows, mtd, lmtd, lmFull, mr, lr);
+
+  // Build raw/d1 tables always
+  rawAll = [...RAW]; rawFil = [...rawAll];
+  document.getElementById('raw-count').textContent = RAW.length.toLocaleString('en-IN') + ' rows';
+  renderRaw();
+  bD1Report(rows);
+}
+
+function showPage(btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('p-' + btn.dataset.p).classList.add('on');
+  setTimeout(() => {
+    const rows = getRows();
+    const mr = mtdRange(), lr = lmtdRange(), lmf = lastMonthFull();
+    const mtd = calcMetrics(rows,mr.from,mr.to);
+    const lmtd= calcMetrics(rows,lr.from,lr.to);
+    const lmFull=calcMetrics(rows,lmf.from,lmf.to);
+    rebuildPageCharts(btn.dataset.p, rows, mtd, lmtd, lmFull, mr, lr);
+  }, 50);
+}
+
+function rebuildPageCharts(page, rows, mtd, lmtd, lmFull, mr, lr) {
+  if (page === 'overview')   { bTrend(rows, mr, lr); bPies(rows, mr); }
+  if (page === 'mtdlmtd')    { bMTDvsLMTD(rows, mr, lr); }
+  if (page === 'hierarchy')  { bHierarchy(rows, mr, lr); }
+  if (page === 'dealers')    { bDealers(rows, mr); }
+  if (page === 'funnel')     { bFunnel(mtd, lmtd, rows, mr, lr); }
+  if (page === 'd1report')   { bD1Report(rows); }
+}
+
+// ══════════════════════════════════════════════════════
+// STRIP (D0 / D1 / MTD)
+// ══════════════════════════════════════════════════════
+function bStrip(rows) {
+  const d0   = new Date(TODAY);
+  const d1   = new Date(TODAY); d1.setDate(d1.getDate()-1);
+  const mr   = mtdRange();
+  const m0   = dayMetrics(rows, d0);
+  const m1   = dayMetrics(rows, d1);
+  const mMTD = calcMetrics(rows, mr.from, mr.to);
+  document.getElementById('d0-date').textContent  = fmtDate(d0);
+  document.getElementById('d1-date').textContent  = fmtDate(d1);
+  document.getElementById('mtd-date').textContent = `${dKey(mr.from)} → ${dKey(mr.to)}`;
+
+  const statHTML = m => [
+    {l:'Leads',       v:m.leads},
+    {l:'Logins',      v:m.logins,    s:pct(m.logins,m.leads)},
+    {l:'Approvals',   v:m.approvals||m.approvals},
+    {l:'Disbursals',  v:m.disbursals||m.disbursals},
+    {l:'Red Cases',   v:m.red},
+  ].map(x => `<div class="pstat"><div class="pstat-l">${x.l}</div><div class="pstat-v">${N(x.v)}</div>${x.s?`<div class="pstat-s">${x.s}</div>`:''}</div>`).join('');
+
+  const mtdHTML = [
+    {l:'Active Dealers', v:mMTD.activeDealers},
+    {l:'Leads',          v:mMTD.leads},
+    {l:'Logins',         v:mMTD.logins,    s:pct(mMTD.logins,mMTD.leads)},
+    {l:'Approvals',      v:mMTD.approvals},
+    {l:'Disbursals',     v:mMTD.disbursals,s:pct(mMTD.disbursals,mMTD.leads)},
+  ].map(x => `<div class="pstat"><div class="pstat-l">${x.l}</div><div class="pstat-v">${N(x.v)}</div>${x.s?`<div class="pstat-s">${x.s}</div>`:''}</div>`).join('');
+
+  document.getElementById('d0-grid').innerHTML  = statHTML(m0);
+  document.getElementById('d1-grid').innerHTML  = statHTML(m1);
+  document.getElementById('mtd-grid').innerHTML = mtdHTML;
+}
+
+// ══════════════════════════════════════════════════════
+// KPI CARDS
+// ══════════════════════════════════════════════════════
+function bKPIs(mtd, lmtd, rows) {
+  const d7from = new Date(TODAY); d7from.setDate(d7from.getDate()-7);
+  const l30from= new Date(TODAY); l30from.setDate(l30from.getDate()-30);
+  const d7   = calcMetrics(rows, d7from, TODAY);
+  const l30  = calcMetrics(rows, l30from, TODAY);
+
+  const kpis = [
+    { l:'D-0 Leads',        v:N(dayMetrics(rows,TODAY).leads),       s:'Today',      c:'#1e50ff' },
+    { l:'D-1 Leads',        v:N(dayMetrics(rows,new Date(new Date(TODAY).setDate(TODAY.getDate()-1))).leads), s:'Yesterday', c:'#f59e0b' },
+    { l:'MTD Leads',        v:N(mtd.leads),    s:delta(mtd.leads,lmtd.leads)+' vs LMTD',    c:'#6d28d9' },
+    { l:'MTD Logins',       v:N(mtd.logins),   s:pct(mtd.logins,mtd.leads)+' of leads',     c:'#c8610a' },
+    { l:'MTD Approvals',    v:N(mtd.approvals),s:pct(mtd.approvals,mtd.logins)+' of logins',c:'#0a7c42' },
+    { l:'MTD Disbursals',   v:N(mtd.disbursals),s:delta(mtd.disbursals,lmtd.disbursals)+' vs LMTD',c:'#0d1f3c' },
+    { l:'Active Dealers',   v:N(mtd.activeDealers), s:'Unique codes (Lead date = MTD)',      c:'#1e50ff' },
+    { l:'Red Channel',      v:N(mtd.red),      s:pct(mtd.red,mtd.leads)+' of leads',        c:'#b91c1c' },
+    { l:'D-7 Leads',        v:N(d7.leads),     s:'Last 7 days',                             c:'#6d28d9' },
+    { l:'D-7 Disbursals',   v:N(d7.disbursals),s:pct(d7.disbursals,d7.leads),               c:'#0a7c42' },
+    { l:'L30 Leads',        v:N(l30.leads),    s:'Last 30 days',                            c:'#c8610a' },
+    { l:'L30 Disbursals',   v:N(l30.disbursals),s:pct(l30.disbursals,l30.leads),            c:'#0d1f3c' },
+  ];
+  document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
+    <div class="kcard" style="--kc:${k.c}">
+      <div class="kl">${k.l}</div>
+      <div class="kv">${k.v}</div>
+      <div class="ks">${k.s}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// MTD vs LMTD CARDS
+// ══════════════════════════════════════════════════════
+function bMVLCards(mtd, lmtd, lmFull) {
+  const ms = [
+    {l:'Leads',     mtd:mtd.leads,     lmtd:lmtd.leads,     lm:lmFull.leads,     c:'#6d28d9'},
+    {l:'Logins',    mtd:mtd.logins,    lmtd:lmtd.logins,    lm:lmFull.logins,    c:'#c8610a'},
+    {l:'Approvals', mtd:mtd.approvals, lmtd:lmtd.approvals, lm:lmFull.approvals, c:'#0a7c42'},
+    {l:'Disbursals',mtd:mtd.disbursals,lmtd:lmtd.disbursals,lm:lmFull.disbursals,c:'#0d1f3c'},
+  ];
+  document.getElementById('mvl-cards').innerHTML = ms.map(m => {
+    const pace = m.lm ? ((m.mtd/m.lm)*100).toFixed(1) : 0;
+    const w = Math.min(+pace, 100);
+    return `<div class="mvl-c">
+      <div class="mvl-label">${m.l}</div>
+      <div class="mvl-row">
+        <div class="mvl-block"><label>MTD</label><div class="mvl-num" style="color:${m.c}">${N(m.mtd)}</div></div>
+        <div class="mvl-block" style="text-align:right"><label>LMTD</label><div class="mvl-num" style="color:var(--muted)">${N(m.lmtd)}</div></div>
+      </div>
+      <div class="mvl-bar"><div class="mvl-fill" style="width:${w}%;background:${m.c}"></div></div>
+      <div class="mvl-sub">${pace}% of LM pace &nbsp;${delta(m.mtd,m.lmtd)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// CHART HELPER
+// ══════════════════════════════════════════════════════
+const P = ['#1e50ff','#0a7c42','#c8610a','#6d28d9','#b91c1c','#0b7b7b','#b01562','#7c5c00','#1a6b8a','#6b3fa0'];
+function mkChart(id, type, data, opts={}) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {type, data, options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},...opts}});
+}
+
+// ══════════════════════════════════════════════════════
+// TREND CHART
+// ══════════════════════════════════════════════════════
+function bTrend(rows, mr, lr) {
+  const from = new Date(TODAY); from.setDate(from.getDate()-30);
+  const days = [];
+  const t = new Date(from);
+  while (t <= TODAY) { days.push(dKey(new Date(t))); t.setDate(t.getDate()+1); }
+
+  const agg = (col, checkEmpty) => {
+    const map = {};
+    rows.forEach(r => {
+      const baseDt = parseDate(r[C.LEAD_DT]);
+      if (!baseDt) return;
+      const k = dKey(baseDt);
+      if (!days.includes(k)) return;
+      if (checkEmpty ? (r[col] && r[col].trim()) : true) {
+        map[k] = (map[k]||0) + 1;
+      }
+    });
+    return days.map(d => map[d]||0);
+  };
+
+  const labels = days.map(d => { const x=new Date(d); return x.getDate()+'/'+(x.getMonth()+1); });
+  mkChart('c-trend', 'line', {
+    labels,
+    datasets:[
+      {label:'Leads',     data:agg(C.LEAD_DT,false),  borderColor:'#1e50ff',backgroundColor:'#1e50ff18',tension:.3,fill:true,borderWidth:2,pointRadius:2,pointHoverRadius:5},
+      {label:'Logins',    data:agg(C.LOGIN_DT,true),  borderColor:'#6d28d9',backgroundColor:'#6d28d915',tension:.3,fill:true,borderWidth:2,pointRadius:2,pointHoverRadius:5},
+      {label:'Approvals', data:agg(C.APPROV_DT,true), borderColor:'#c8610a',backgroundColor:'#c8610a12',tension:.3,fill:true,borderWidth:2,pointRadius:2,pointHoverRadius:5},
+      {label:'Disbursals',data:agg(C.DISB_DT,true),   borderColor:'#0a7c42',backgroundColor:'#0a7c4212',tension:.3,fill:true,borderWidth:2,pointRadius:2,pointHoverRadius:5},
+    ]
+  },{plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'}},x:{grid:{display:false},ticks:{font:{size:10},maxRotation:45,minRotation:45}}}});
+}
+
+// ══════════════════════════════════════════════════════
+// PIE CHARTS
+// ══════════════════════════════════════════════════════
+function bPies(rows, mr) {
+  function pie(id, groupFn, filterFn) {
+    const g = {};
+    rows.filter(r => inRange(parseDate(r[C.LEAD_DT]), mr.from, mr.to)).filter(filterFn).forEach(r => {
+      const k = groupFn(r) || 'Other'; g[k] = (g[k]||0) + 1;
+    });
+    const ents = Object.entries(g).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    mkChart(id, 'doughnut', {
+      labels: ents.map(([k])=>k),
+      datasets:[{data:ents.map(([,v])=>v), backgroundColor:P, borderWidth:2, borderColor:'#fff'}]
+    },{plugins:{legend:{position:'right',labels:{padding:8,font:{size:10},usePointStyle:true}},datalabels:{display:false},tooltip:{callbacks:{label:c=>{const t=c.dataset.data.reduce((a,b)=>a+b,0);return`${c.label}: ${N(c.parsed)} (${((c.parsed/t)*100).toFixed(1)}%)`;}}}}});
+  }
+  pie('c-pie-leads', r => r[C.CHANNEL], () => true);
+  pie('c-pie-disb',  r => r[C.CHANNEL], r => r[C.DISB_DT] && r[C.DISB_DT].trim());
+  pie('c-pie-red',   r => isRed(r) ? 'Red Flag' : 'Normal', () => true);
+}
+
+// ══════════════════════════════════════════════════════
+// MTD vs LMTD CHARTS
+// ══════════════════════════════════════════════════════
+function bMTDvsLMTD(rows, mr, lr) {
+  const dom = TODAY.getDate();
+  const labels = Array.from({length:dom}, (_,i) => 'D'+(i+1));
+
+  function domSeries(col, checkEmpty, year, month) {
+    const map = {};
+    rows.forEach(r => {
+      const bd = parseDate(r[C.LEAD_DT]);
+      if (!bd || bd.getFullYear()!==year || bd.getMonth()!==month) return;
+      if (checkEmpty && (!r[col] || !r[col].trim())) return;
+      const d = bd.getDate();
+      map[d] = (map[d]||0)+1;
+    });
+    return Array.from({length:dom}, (_,i) => map[i+1]||0);
+  }
+
+  function cmpChart(id, col, checkEmpty, color) {
+    mkChart(id,'bar',{labels, datasets:[
+      {label:'MTD', data:domSeries(col,checkEmpty,TODAY.getFullYear(),TODAY.getMonth()), backgroundColor:color, borderRadius:3, barPercentage:.7},
+      {label:'LMTD',data:domSeries(col,checkEmpty,TODAY.getFullYear(),TODAY.getMonth()-1), backgroundColor:color+'55', borderRadius:3, barPercentage:.7},
+    ]},{plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'}},x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,callback:(_,i)=>i%7===0?'D'+(i+1):''}}}}); }
+
+  cmpChart('c-ml',  C.LEAD_DT,  false, '#1e50ff');
+  cmpChart('c-mlg', C.LOGIN_DT, true,  '#6d28d9');
+  cmpChart('c-ma',  C.APPROV_DT,true,  '#c8610a');
+  cmpChart('c-md',  C.DISB_DT,  true,  '#0a7c42');
+
+  // Cumulative
+  const cum = arr => arr.reduce((a,v,i)=>{a.push((a[i-1]||0)+v);return a;},[]);
+  mkChart('c-cum','line',{labels, datasets:[
+    {label:'MTD Leads',      data:cum(domSeries(C.LEAD_DT,false,TODAY.getFullYear(),TODAY.getMonth())),     borderColor:'#1e50ff',borderWidth:2.5,tension:.3,pointRadius:0,fill:false},
+    {label:'LMTD Leads',     data:cum(domSeries(C.LEAD_DT,false,TODAY.getFullYear(),TODAY.getMonth()-1)),   borderColor:'#1e50ff',borderWidth:2,borderDash:[5,4],tension:.3,pointRadius:0,fill:false},
+    {label:'MTD Disbursals', data:cum(domSeries(C.DISB_DT,true,TODAY.getFullYear(),TODAY.getMonth())),      borderColor:'#0a7c42',borderWidth:2.5,tension:.3,pointRadius:0,fill:false},
+    {label:'LMTD Disbursals',data:cum(domSeries(C.DISB_DT,true,TODAY.getFullYear(),TODAY.getMonth()-1)),    borderColor:'#0a7c42',borderWidth:2,borderDash:[5,4],tension:.3,pointRadius:0,fill:false},
+  ]},{plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'}},x:{grid:{display:false}}}});
+}
+
+// ══════════════════════════════════════════════════════
+// HIERARCHY (RSM → SM → FOS)
+// ══════════════════════════════════════════════════════
+function calcHierarchyTots(rows, groupCol, mr, lr) {
+  const names = [...new Set(rows.map(r=>r[groupCol]).filter(Boolean))].sort();
+  return names.map(name => {
+    const r = rows.filter(x => x[groupCol] === name);
+    const m = calcMetrics(r, mr.from, mr.to);
+    const l = calcMetrics(r, lr.from, lr.to);
+    return { name, mtd:m, lmtd:l };
+  });
+}
+
+const hierHeads = ['Name','MTD Leads','LMTD Leads','Δ Leads','MTD Logins','MTD Approv','MTD Disb','LMTD Disb','Δ Disb','Login %','Disb %','Active Dealers','Red'];
+function hierRow(x, cls='') {
+  return `<tr>
+    <td><strong style="color:var(--navy)${cls}">${x.name}</strong></td>
+    <td class="nm">${N(x.mtd.leads)}</td><td class="nm">${N(x.lmtd.leads)}</td><td>${delta(x.mtd.leads,x.lmtd.leads)}</td>
+    <td class="nm">${N(x.mtd.logins)}</td><td class="nm">${N(x.mtd.approvals)}</td>
+    <td class="nm" style="color:var(--green)">${N(x.mtd.disbursals)}</td>
+    <td class="nm">${N(x.lmtd.disbursals)}</td><td>${delta(x.mtd.disbursals,x.lmtd.disbursals)}</td>
+    <td class="pc">${pct(x.mtd.logins,x.mtd.leads)}</td>
+    <td class="pc">${pct(x.mtd.disbursals,x.mtd.leads)}</td>
+    <td class="nm">${N(x.mtd.activeDealers)}</td>
+    <td class="nm" style="color:var(--red)">${N(x.mtd.red)}</td>
+  </tr>`;
+}
+
+function bHierarchy(rows, mr, lr) {
+  const rsmData = calcHierarchyTots(rows, C.RSM, mr, lr);
+  const smData  = calcHierarchyTots(rows, C.SM,  mr, lr);
+  const fosData = calcHierarchyTots(rows, C.FOS, mr, lr);
+
+  document.getElementById('rsm-h').innerHTML = hierHeads.map(h=>`<th>${h}</th>`).join('');
+  document.getElementById('rsm-b').innerHTML = rsmData.map(x=>hierRow(x)).join('');
+  document.getElementById('sm-h').innerHTML  = hierHeads.map(h=>`<th>${h}</th>`).join('');
+  document.getElementById('sm-b').innerHTML  = smData.map(x=>hierRow(x)).join('');
+
+  fosAll = fosData; fosFil = [...fosAll]; fosPg = 0;
+  document.getElementById('fos-h').innerHTML = hierHeads.map(h=>`<th>${h}</th>`).join('');
+  renderFOS();
+
+  // RSM chart
+  mkChart('c-rsm','bar',{
+    labels:rsmData.map(x=>x.name),
+    datasets:[
+      {label:'MTD Leads',      data:rsmData.map(x=>x.mtd.leads),     backgroundColor:'#1e50ff',  borderRadius:4},
+      {label:'LMTD Leads',     data:rsmData.map(x=>x.lmtd.leads),    backgroundColor:'#1e50ff44',borderRadius:4},
+      {label:'MTD Disbursals', data:rsmData.map(x=>x.mtd.disbursals),backgroundColor:'#0a7c42',  borderRadius:4},
+      {label:'LMTD Disbursals',data:rsmData.map(x=>x.lmtd.disbursals),backgroundColor:'#0a7c4244',borderRadius:4},
+    ]
+  },{plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'}},x:{grid:{display:false}}}});
+
+  // SM chart
+  mkChart('c-sm','bar',{
+    labels:smData.map(x=>x.name),
+    datasets:[
+      {label:'MTD Disbursals', data:smData.map(x=>x.mtd.disbursals), backgroundColor:P,borderRadius:4},
+    ]
+  },{plugins:{legend:{display:false},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'}},x:{grid:{display:false},ticks:{maxRotation:45,minRotation:45,font:{size:10}}}}});
+}
+
+function filterFOS(q) {
+  const l = q.toLowerCase();
+  fosFil = l ? fosAll.filter(x=>x.name.toLowerCase().includes(l)) : [...fosAll];
+  fosPg = 0; renderFOS();
+}
+function renderFOS() {
+  const s = fosPg*PG, sl = fosFil.slice(s,s+PG);
+  document.getElementById('fos-b').innerHTML = sl.map(x=>hierRow(x)).join('');
+  const t=fosFil.length, pg=Math.ceil(t/PG)||1;
+  document.getElementById('fos-pg').innerHTML = `<span>${s+1}–${Math.min(s+PG,t)} of ${t}</span><div style="margin-left:auto;display:flex;gap:8px;align-items:center">${fosPg>0?`<button class="chip" onclick="fosPg--;renderFOS()">← Prev</button>`:''}<span>Pg ${fosPg+1}/${pg}</span>${fosPg<pg-1?`<button class="chip" onclick="fosPg++;renderFOS()">Next →</button>`:''}</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// DEALERS
+// ══════════════════════════════════════════════════════
+function bDealers(rows, mr) {
+  const g = {};
+  rows.forEach(r => {
+    const bd = parseDate(r[C.LEAD_DT]);
+    if (!inRange(bd, mr.from, mr.to)) return;
+    const code = r[C.DEALER_CODE] || '—';
+    const name = r[C.DEALER_NAME] || '—';
+    if (!g[code]) g[code]={code,name,city:r[C.CITY]||'—',ch:r[C.CHANNEL]||'—',leads:0,logins:0,approvals:0,disbursals:0,red:0};
+    g[code].leads++;
+    if (r[C.LOGIN_DT]  && r[C.LOGIN_DT].trim())  g[code].logins++;
+    if (r[C.APPROV_DT] && r[C.APPROV_DT].trim()) g[code].approvals++;
+    if (r[C.DISB_DT]   && r[C.DISB_DT].trim())   g[code].disbursals++;
+    if (isRed(r)) g[code].red++;
+  });
+  dlrAll = Object.values(g).sort((a,b) => b.disbursals-a.disbursals);
+  dlrFil = [...dlrAll];
+  document.getElementById('dlr-count').textContent = dlrAll.length.toLocaleString('en-IN') + ' dealers';
+
+  const total = dlrAll.reduce((s,d)=>s+d.disbursals,0);
+  const active = dlrAll.filter(d=>d.disbursals>0).length;
+  document.getElementById('dlr-kpis').innerHTML = [
+    {l:'Total Dealers',     v:N(dlrAll.length),                    s:'In MTD period',              c:'#0d1f3c'},
+    {l:'Active (Disb>0)',   v:N(active),                           s:pct(active,dlrAll.length)+' active',c:'#0a7c42'},
+    {l:'Top 5 Disb Share',  v:pct(dlrAll.slice(0,5).reduce((s,d)=>s+d.disbursals,0),total),s:'Concentration',c:'#1e50ff'},
+    {l:'Avg Disb/Dealer',   v:(active?total/active:0).toFixed(1),  s:'Per active dealer',          c:'#c8610a'},
+  ].map(k=>`<div class="kcard" style="--kc:${k.c}"><div class="kl">${k.l}</div><div class="kv">${k.v}</div><div class="ks">${k.s}</div></div>`).join('');
+
+  const top15 = dlrAll.slice(0,15);
+  mkChart('c-dlr-leads','bar',{labels:top15.map(d=>d.name.slice(0,12)),datasets:[{label:'Leads',data:top15.map(d=>d.leads),backgroundColor:'#1e50ff',borderRadius:4}]},{indexAxis:'y',plugins:{legend:{display:false},datalabels:{display:false}},scales:{x:{beginAtZero:true,grid:{color:'#eef1f8'}},y:{grid:{display:false},ticks:{font:{size:10}}}}});
+  mkChart('c-dlr-disb','bar',{labels:top15.map(d=>d.name.slice(0,12)),datasets:[{label:'Disbursals',data:top15.map(d=>d.disbursals),backgroundColor:P,borderRadius:4}]},{indexAxis:'y',plugins:{legend:{display:false},datalabels:{display:false}},scales:{x:{beginAtZero:true,grid:{color:'#eef1f8'}},y:{grid:{display:false},ticks:{font:{size:10}}}}});
+
+  renderDlr();
+}
+function filterDealers(q){const l=q.toLowerCase();dlrFil=l?dlrAll.filter(d=>d.name.toLowerCase().includes(l)||d.code.toLowerCase().includes(l)||d.city.toLowerCase().includes(l)):[...dlrAll];dlrPg=0;renderDlr();}
+function renderDlr(){
+  document.getElementById('dlr-h').innerHTML=['Code','Dealer','City','Channel','Leads','Logins','Login %','Approvals','Approv %','Disbursals','L→D %','Red'].map(h=>`<th>${h}</th>`).join('');
+  const s=dlrPg*PG,sl=dlrFil.slice(s,s+PG);
+  document.getElementById('dlr-b').innerHTML=sl.map(d=>`<tr>
+    <td class="pc" style="font-size:10px">${d.code}</td>
+    <td><strong style="color:var(--navy)">${d.name}</strong></td>
+    <td style="color:var(--text2)">${d.city}</td>
+    <td><span class="cb ${chClass(d.ch)}">${d.ch}</span></td>
+    <td class="nm">${d.leads}</td><td class="nm">${d.logins}</td><td class="pc">${pct(d.logins,d.leads)}</td>
+    <td class="nm">${d.approvals}</td><td class="pc">${pct(d.approvals,d.logins)}</td>
+    <td class="nm" style="color:var(--green)">${d.disbursals}</td>
+    <td class="pc">${pct(d.disbursals,d.leads)}</td>
+    <td class="nm" style="color:var(--red)">${d.red}</td>
+  </tr>`).join('');
+  const t=dlrFil.length,pg=Math.ceil(t/PG)||1;
+  document.getElementById('dlr-pg').innerHTML=`<span>${s+1}–${Math.min(s+PG,t)} of ${t}</span><div style="margin-left:auto;display:flex;gap:8px;align-items:center">${dlrPg>0?`<button class="chip" onclick="dlrPg--;renderDlr()">← Prev</button>`:''}<span>Pg ${dlrPg+1}/${pg}</span>${dlrPg<pg-1?`<button class="chip" onclick="dlrPg++;renderDlr()">Next →</button>`:''}</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// FUNNEL
+// ══════════════════════════════════════════════════════
+function bFunnel(mtd, lmtd, rows, mr, lr) {
+  [[' fn-mtd',mtd],[' fn-lmtd',lmtd]].forEach(([id,m])=>{
+    const stages=[
+      {nm:'LEADS',     v:m.leads,     p:'Top of funnel',                         bg:'rgba(30,80,255,.07)',  br:'rgba(30,80,255,.2)', tc:'#1e50ff'},
+      {nm:'LOGINS',    v:m.logins,    p:pct(m.logins,m.leads)+' of leads',        bg:'rgba(109,40,217,.07)',br:'rgba(109,40,217,.2)',tc:'#6d28d9'},
+      {nm:'APPROVALS', v:m.approvals, p:pct(m.approvals,m.logins)+' of logins',   bg:'rgba(200,97,10,.07)', br:'rgba(200,97,10,.2)', tc:'#c8610a'},
+      {nm:'DISBURSALS',v:m.disbursals,p:pct(m.disbursals,m.leads)+' lead→disb',   bg:'rgba(10,124,66,.07)', br:'rgba(10,124,66,.2)', tc:'#0a7c42'},
+    ];
+    const ws=[100,84,68,52];
+    document.getElementById(id.trim()).innerHTML=stages.map((s,i)=>`
+      <div class="fn-stage" style="background:${s.bg};border-color:${s.br};width:${ws[i]}%">
+        <div class="fn-nm" style="color:${s.tc}">${s.nm}</div>
+        <div>
+          <div class="fn-v" style="color:${s.tc}">${N(s.v)}</div>
+          <div class="fn-p" style="color:${s.tc}">${s.p}</div>
+        </div>
+      </div>${i<3?'<div class="fn-arrow">▼</div>':''}`).join('');
+  });
+
+  mkChart('c-conv','bar',{
+    labels:['Login Rate','Approval Rate','Disb Rate','Lead→Disb'],
+    datasets:[
+      {label:'MTD', data:[pctN(mtd.logins,mtd.leads),pctN(mtd.approvals,mtd.logins),pctN(mtd.disbursals,mtd.approvals),pctN(mtd.disbursals,mtd.leads)],backgroundColor:'#1e50ff',borderRadius:6},
+      {label:'LMTD',data:[pctN(lmtd.logins,lmtd.leads),pctN(lmtd.approvals,lmtd.logins),pctN(lmtd.disbursals,lmtd.approvals),pctN(lmtd.disbursals,lmtd.leads)],backgroundColor:'#1e50ff44',borderRadius:6},
+    ]
+  },{plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}}});
+
+  // Red MTD vs LMTD by day
+  const dom=TODAY.getDate(), labels=Array.from({length:dom},(_,i)=>'D'+(i+1));
+  function redDomSeries(year,month){const map={};rows.forEach(r=>{const bd=parseDate(r[C.LEAD_DT]);if(!bd||bd.getFullYear()!==year||bd.getMonth()!==month||!isRed(r))return;map[bd.getDate()]=(map[bd.getDate()]||0)+1;});return Array.from({length:dom},(_,i)=>map[i+1]||0);}
+  mkChart('c-red','bar',{labels,datasets:[
+    {label:'MTD Red',  data:redDomSeries(TODAY.getFullYear(),TODAY.getMonth()),   backgroundColor:'#b91c1c',  borderRadius:4,barPercentage:.7},
+    {label:'LMTD Red', data:redDomSeries(TODAY.getFullYear(),TODAY.getMonth()-1), backgroundColor:'#b91c1c44',borderRadius:4,barPercentage:.7},
+  ]},{plugins:{legend:{position:'top',align:'end',labels:{usePointStyle:true,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#eef1f8'}},x:{grid:{display:false},ticks:{font:{size:9},maxRotation:0,callback:(_,i)=>i%7===0?'D'+(i+1):''}}}}); }
+
+// ══════════════════════════════════════════════════════
+// D-1 REPORT
+// ══════════════════════════════════════════════════════
+function bD1Report(rows) {
+  const d1 = new Date(TODAY); d1.setDate(d1.getDate()-1);
+  document.getElementById('d1r-date').textContent = fmtDate(d1);
+
+  // D-1 disbursals: rows where LEAD_CREATION_DATE = D-1 AND DISB_DT not empty
+  d1All = rows.filter(r => {
+    const bd = parseDate(r[C.LEAD_DT]);
+    return sameDay(bd, d1) && r[C.DISB_DT] && r[C.DISB_DT].trim();
+  });
+  d1Fil = [...d1All]; d1Pg = 0;
+
+  const m = calcMetrics(rows, d1, d1);
+  document.getElementById('d1r-kpis').innerHTML=[
+    {l:'Disbursals',      v:N(d1All.length),         s:'DISB_DT not empty on D-1 leads',c:'#0a7c42'},
+    {l:'Leads D-1',       v:N(m.leads),              s:'LEAD_CREATION_DATE = D-1',       c:'#1e50ff'},
+    {l:'Unique Dealers',  v:N(new Set(d1All.map(r=>r[C.DEALER_CODE]).filter(Boolean)).size),s:'Unique dealer codes',c:'#6d28d9'},
+    {l:'Red Cases',       v:N(d1All.filter(isRed).length),s:pct(d1All.filter(isRed).length,d1All.length),c:'#b91c1c'},
+  ].map(k=>`<div class="kcard" style="--kc:${k.c}"><div class="kl">${k.l}</div><div class="kv">${k.v}</div><div class="ks">${k.s}</div></div>`).join('');
+
+  // SM summary
+  const smG = {};
+  d1All.forEach(r=>{const sm=r[C.SM]||'—';if(!smG[sm])smG[sm]={cnt:0,dealers:new Set(),rsm:r[C.RSM]||'—'};smG[sm].cnt++;smG[sm].dealers.add(r[C.DEALER_CODE]);});
+  document.getElementById('d1sm-h').innerHTML=['SM','RSM','Disbursals','Unique Dealers'].map(h=>`<th>${h}</th>`).join('');
+  document.getElementById('d1sm-b').innerHTML=Object.entries(smG).sort((a,b)=>b[1].cnt-a[1].cnt).map(([sm,v])=>`<tr><td><strong style="color:var(--navy)">${sm}</strong></td><td class="pc">${v.rsm}</td><td class="nm" style="color:var(--green)">${v.cnt}</td><td class="nm">${v.dealers.size}</td></tr>`).join('');
+
+  renderD1();
+}
+function filterD1(q){const l=q.toLowerCase();d1Fil=l?d1All.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(l))):[...d1All];d1Pg=0;renderD1();}
+function renderD1(){
+  if(!d1Fil.length){document.getElementById('d1r-h').innerHTML='<th>No disbursals found for D-1</th>';document.getElementById('d1r-b').innerHTML='';document.getElementById('d1r-pg').innerHTML='';return;}
+  const allCols=Object.keys(d1Fil[0]);
+  document.getElementById('d1r-h').innerHTML=allCols.map(c=>`<th title="${c}">${c.length>14?c.slice(0,12)+'…':c}</th>`).join('');
+  const s=d1Pg*PG,sl=d1Fil.slice(s,s+PG);
+  document.getElementById('d1r-b').innerHTML=sl.map(r=>`<tr>${allCols.map(c=>{const v=r[c]||'';const isN=!isNaN(parseFloat(v.replace(/[₹, ]/g,'')))&&v!=='';return`<td class="${isN?'nm':''}" title="${v}" style="white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis">${v.length>20?v.slice(0,18)+'…':v}</td>`;}).join('')}</tr>`).join('');
+  const t=d1Fil.length,pg=Math.ceil(t/PG)||1;
+  document.getElementById('d1r-pg').innerHTML=`<span>${s+1}–${Math.min(s+PG,t)} of ${t} disbursals</span><div style="margin-left:auto;display:flex;gap:8px;align-items:center">${d1Pg>0?`<button class="chip" onclick="d1Pg--;renderD1()">← Prev</button>`:''}<span>Pg ${d1Pg+1}/${pg}</span>${d1Pg<pg-1?`<button class="chip" onclick="d1Pg++;renderD1()">Next →</button>`:''}</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// RAW DATA TABLE
+// ══════════════════════════════════════════════════════
+function filterRaw(q){const l=q.toLowerCase();rawFil=l?rawAll.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(l))):[...rawAll];rawPg=0;renderRaw();}
+function renderRaw(){
+  if(!rawFil.length)return;
+  const priorityCols=[C.LEAD_ID,C.LEAD_DT,C.LOGIN_DT,C.APPROV_DT,C.DISB_DT,C.CHANNEL,C.DEALER_NAME,C.CITY,C.RED,C.SM,C.RSM];
+  const allK=Object.keys(rawFil[0]);
+  const cols=[...priorityCols.filter(c=>allK.includes(c)),...allK.filter(c=>!priorityCols.includes(c))].slice(0,16);
+  document.getElementById('raw-h').innerHTML=cols.map(c=>`<th title="${c}">${c.length>14?c.slice(0,12)+'…':c}</th>`).join('');
+  const s=rawPg*PG,sl=rawFil.slice(s,s+PG);
+  document.getElementById('raw-b').innerHTML=sl.map(r=>`<tr>${cols.map(c=>{const v=r[c]||'';const isN=!isNaN(parseFloat(v.replace(/[₹, ]/g,'')))&&v!=='';return`<td class="${isN?'nm':''}" title="${v}">${v.length>22?v.slice(0,20)+'…':v}</td>`;}).join('')}</tr>`).join('');
+  const t=rawFil.length,pg=Math.ceil(t/PG)||1;
+  document.getElementById('raw-pg').innerHTML=`<span>${s+1}–${Math.min(s+PG,t)} of ${t}</span><div style="margin-left:auto;display:flex;gap:8px;align-items:center">${rawPg>0?`<button class="chip" onclick="rawPg--;renderRaw()">← Prev</button>`:''}<span>Pg ${rawPg+1}/${pg}</span>${rawPg<pg-1?`<button class="chip" onclick="rawPg++;renderRaw()">Next →</button>`:''}</div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+loadAll();
+</script>
+</body>
+</html>
